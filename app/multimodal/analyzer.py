@@ -44,11 +44,24 @@ class ClaimsEvidenceAnalyzer:
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "Analyze image. Ensure confidence is a number and water_damage_visible is a boolean."},
+                        {
+                            "type": "text", 
+                            "text": "Analyze hardware for damage. Detect tampering and water exposure per policy."
+                        },
                         {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{encoded_image}"}}
                     ],
                 },
             ],
+        )
+
+        raw_data = json.loads(response.choices[0].message.content)
+        
+        return VisionAssessment(
+            damage_type=raw_data.get("damage_type"),
+            confidence=raw_data.get("confidence", 0.0),
+            water_damage_visible=raw_data.get("water_damage_visible", False),
+            tampering_visible=raw_data.get("tampering_visible", False),
+            image_quality=raw_data.get("image_quality", "good")
         )
 
         data = json.loads(response.choices[0].message.content)

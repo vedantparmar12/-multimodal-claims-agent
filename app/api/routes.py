@@ -1,21 +1,31 @@
 import os
 from fastapi import APIRouter, HTTPException
-from app.models.schemas import UploadedEvidence, VisionAssessment
-from app.multimodal.analyzer import ClaimsEvidenceAnalyzer
+from app.models.schemas import UploadedEvidence, ClaimWorkflowState
+from app.agents.workflow import ClaimWorkflow
 
 router = APIRouter()
-evidence_analyzer = ClaimsEvidenceAnalyzer()
+workflow = ClaimWorkflow()
 
 @router.get("/health")
 async def health():
     return {"status": "ok"}
 
-@router.post("/claims/analyze-image", response_model=VisionAssessment)
-async def analyze_claim_image(uploaded_evidence: UploadedEvidence):
-    if not os.path.exists(uploaded_evidence.image_path):
-        raise HTTPException(status_code=404, detail="Evidence file not found")
+@router.post("/claims/evaluate")
+async def evaluate_claim(evidence: UploadedEvidence):
+    if not os.path.exists(evidence.image_path):
+        raise HTTPException(status_code=404, detail="Image not found")
     
     try:
-        return evidence_analyzer.analyze_damage_image(uploaded_evidence.image_path)
+        state = ClaimWorkflowState(claim_id=evidence.claim_id)
+        
+        result = workflow.process_claim(state, evidence.image_path)
+        
+        return {
+            "claim_id": result.claim_id,
+            "assessment": result.vision_assessment,
+            "decision": result.final_decision
+        }
+        
     except Exception as e:
+        # Triage failure
         raise HTTPException(status_code=500, detail=str(e))

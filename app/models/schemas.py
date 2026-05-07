@@ -2,11 +2,11 @@ from typing import List, Optional, Literal
 from pydantic import BaseModel, Field
 
 class VisionAssessment(BaseModel):
-    damage_type: str
-    severity: str
-    confidence: float
-    water_damage_visible: bool
-    image_quality: str
+    damage_type: Optional[str] = None
+    confidence: float = 0.0
+    water_damage_visible: bool = False
+    tampering_visible: bool = False
+    image_quality: Literal["good", "poor", "invalid"] = "good"
 
 class UploadedEvidence(BaseModel):
     claim_id: str
