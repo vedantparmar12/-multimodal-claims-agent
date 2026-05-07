@@ -16,3 +16,13 @@ class ClaimWorkflowState(BaseModel):
 class ClaimSession(BaseModel):
     claim_id: str
     status: Literal["open", "awaiting_documents", "under_review"]
+
+class VisionAssessment(BaseModel):
+    damage_type: str
+    confidence: float
+    water_damage_visible: bool
+    image_quality: str
+
+class UploadedEvidence(BaseModel):
+    claim_id: str
+    image_path: str
