@@ -15,3 +15,8 @@ docker-compose up --build
 - `/engine`: Deterministic rule engine and Priority Queue.
 - `/data`: VoltEdge Policy Markdown and vector store.
 - `/docs`: Architecture, Evals, and AI Usage logs.
+
+## 👤 Author
+**Saurabh Kumar**
+*Staff AI Engineer*
+https://www.linkedin.com/in/saurabh-k-38422a103/
