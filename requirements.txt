@@ -6,3 +6,5 @@ openai
 tiktoken
 python-dotenv
 pillow
+python-multipart
+aiofiles

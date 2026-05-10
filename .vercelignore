@@ -1,0 +1,14 @@
+.git
+.env
+.venv
+venv/
+__pycache__
+**/__pycache__
+*.pyc
+*.egg-info
+.pytest_cache
+.mypy_cache
+docker-compose.yml
+Dockerfile
+.dockerignore
+senior_staff_context.txt

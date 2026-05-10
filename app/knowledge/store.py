@@ -1,4 +1,5 @@
 import os
+import shutil
 import chromadb
 from openai import OpenAI
 from dotenv import load_dotenv
@@ -7,8 +8,19 @@ load_dotenv()
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
+def _get_db_path() -> str:
+    # Vercel filesystem is read-only except /tmp — copy bundled DB there on cold start
+    bundled = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/vector_db"))
+    if os.environ.get("VERCEL"):
+        tmp = "/tmp/chroma_db"
+        if not os.path.exists(tmp) and os.path.exists(bundled):
+            shutil.copytree(bundled, tmp)
+        return tmp
+    return bundled
+
 class PolicyStore:
-    def __init__(self, db_path: str = "./data/vector_db"):
+    def __init__(self):
+        db_path = _get_db_path()
         self.chroma = chromadb.PersistentClient(path=db_path)
         self.collection = self.chroma.get_or_create_collection(
             name="voltedge_rules",

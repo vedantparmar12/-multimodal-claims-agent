@@ -22,18 +22,16 @@ class ClaimsEvidenceAnalyzer:
         self.client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
     def _safe_float(self, value, default=0.0) -> float:
-        """Coerces potential string confidence labels to floats."""
         mapping = {"high": 0.9, "medium": 0.6, "low": 0.3}
         if isinstance(value, str):
             return mapping.get(value.lower(), default)
-        # try:
-        #     return float(value)
-        # except (TypeError, ValueError):
-        #     return default
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return default
 
-    def analyze_damage_image(self, image_path: str) -> VisionAssessment:
-        with open(image_path, "rb") as image_file:
-            encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
+    def analyze_damage_image(self, image_bytes: bytes) -> VisionAssessment:
+        encoded_image = base64.b64encode(image_bytes).decode("utf-8")
 
         response = self.client.chat.completions.create(
             model="gpt-4o-mini",
