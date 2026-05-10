@@ -7,7 +7,7 @@ class ClaimWorkflow:
     def __init__(self):
         self.engine = ClaimsDecisionEngine()
         self.analyzer = ClaimsEvidenceAnalyzer()
-        self.retriever = PolicyStore()
+        self.retriever = PolicyStore.get()  # singleton — seeded once per container
 
     def process_claim(self, state: ClaimWorkflowState, image_bytes: bytes) -> ClaimWorkflowState:
         # Pull policy context

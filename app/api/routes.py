@@ -3,7 +3,13 @@ from app.models.schemas import ClaimWorkflowState
 from app.agents.workflow import ClaimWorkflow
 
 router = APIRouter()
-workflow = ClaimWorkflow()
+_workflow: ClaimWorkflow | None = None
+
+def get_workflow() -> ClaimWorkflow:
+    global _workflow
+    if _workflow is None:
+        _workflow = ClaimWorkflow()
+    return _workflow
 
 @router.get("/health")
 async def health():
@@ -24,7 +30,7 @@ async def evaluate_claim(
             claim_id=claim_id,
             customer_statement=customer_statement
         )
-        result = workflow.process_claim(state, image_bytes)
+        result = get_workflow().process_claim(state, image_bytes)
 
         clean_policy_context = [
             clause for clause in result.retrieved_clauses
