@@ -1,0 +1,16 @@
+.git
+.github
+__pycache__
+**/__pycache__
+*.pyc
+*.pyo
+*.pyd
+.env
+.venv
+venv/
+*.egg-info
+.pytest_cache
+.mypy_cache
+data/vector_db
+app/chroma_db
+docker-compose.yml
