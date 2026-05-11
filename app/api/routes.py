@@ -1,30 +1,36 @@
-import os
-from fastapi import APIRouter, HTTPException
-from app.models.schemas import ClaimWorkflowState, ClaimRequest
+from fastapi import APIRouter, HTTPException, UploadFile, File, Form
+from app.models.schemas import ClaimWorkflowState
 from app.agents.workflow import ClaimWorkflow
 
 router = APIRouter()
-workflow = ClaimWorkflow()
+_workflow: ClaimWorkflow | None = None
+
+def get_workflow() -> ClaimWorkflow:
+    global _workflow
+    if _workflow is None:
+        _workflow = ClaimWorkflow()
+    return _workflow
 
 @router.get("/health")
 async def health():
     return {"status": "ok"}
 
 @router.post("/claims/evaluate")
-async def evaluate_claim(request: ClaimRequest):
-    evidence = request.evidence
-
-    if not os.path.exists(evidence.image_path):
-        raise HTTPException(status_code=404, detail="Image not found")
+async def evaluate_claim(
+    claim_id: str = Form(...),
+    customer_statement: str = Form(...),
+    image: UploadFile = File(...)
+):
+    image_bytes = await image.read()
+    if not image_bytes:
+        raise HTTPException(status_code=400, detail="Image file is empty")
 
     try:
-        # Initialize state with the user's input
         state = ClaimWorkflowState(
-            claim_id=evidence.claim_id,
-            customer_statement=request.customer_statement
+            claim_id=claim_id,
+            customer_statement=customer_statement
         )
-
-        result = workflow.process_claim(state, evidence.image_path)
+        result = get_workflow().process_claim(state, image_bytes)
 
         clean_policy_context = [
             clause for clause in result.retrieved_clauses
