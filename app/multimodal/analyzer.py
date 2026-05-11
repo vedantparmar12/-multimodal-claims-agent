@@ -30,8 +30,9 @@ class ClaimsEvidenceAnalyzer:
         except (TypeError, ValueError):
             return default
 
-    def analyze_damage_image(self, image_bytes: bytes) -> VisionAssessment:
-        encoded_image = base64.b64encode(image_bytes).decode("utf-8")
+    def analyze_damage_image(self, image_path: str) -> VisionAssessment:
+        with open(image_path, "rb") as image_file:
+            encoded_image = base64.b64encode(image_file.read()).decode("utf-8")
 
         response = self.client.chat.completions.create(
             model="gpt-4o-mini",

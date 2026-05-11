@@ -32,7 +32,15 @@ class ClaimsDecisionEngine:
                 confidence=v.confidence,
                 policy_references=refs
             )
-        
+
+        if any(x in dtype for x in ["none", "no damage", "undamaged", "clean", "normal"]):
+            return ClaimDecision(
+                decision="manual_review",
+                reason_codes=["NO_VISIBLE_DAMAGE"],
+                confidence=v.confidence,
+                policy_references=refs
+            )
+
         is_high_quality = v.image_quality.lower() in ["good", "high", "excellent"]
 
         if not is_high_quality or v.confidence < 0.60:
